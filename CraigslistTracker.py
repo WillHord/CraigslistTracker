@@ -51,6 +51,63 @@ class CraigslistTracker():
             output = output + self.checkPage(re.search(r".+?(?:org)", url).group() + nextPage.attrib["href"])
         return output
 
+    def handleEmails(self):
+        
+        css = """<style>
+                    #Page {
+                    font-family: Arial, Helvetica, sans-serif;
+                    border-collapse: collapse;
+                    width: 100%;
+                    }
+
+                    #Page td, #Page th {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                    }
+
+                    #Page tr:nth-child(even){background-color: #f2f2f2;}
+
+                    #Page tr:hover {background-color: #ddd;}
+
+                    #Page th {
+                    padding-top: 12px;
+                    padding-bottom: 12px;
+                    text-align: left;
+                    background-color: #0d7dd9;
+                    color: white;
+                    }
+                </style>"""
+        html = f"""
+            <html>
+                <head>
+                {css}
+                </head>
+                <body>
+                <h2><a href="willhord.org">Page Name</a></h2>
+                    <table id="Page">
+                    <tr>
+                        <th>Item</th>
+                        <th>Price</th>
+                        <th>Location</th>
+                        <th>Date Posted</th>
+                    </tr>
+                    <tr>
+                        <td><a href="willhord.org">Item 1</a></td>
+                        <td>$23</td>
+                        <td>Santa Cruz</td>
+                        <td>March 4</td>
+                    </tr>
+                    <tr>
+                        <td><a href="willhord.org">Item 2</a></td>
+                        <td>$3</td>
+                        <td>Santa Cruz</td>
+                        <td>March 2</td>
+                    </tr>
+                </table>
+                </body>
+                </html>"""
+        pass
+
     def sendEmail(self, recipient: str, subject: str, message: str):
         print(f"Sending email to {recipient}\nsubject:{subject}\nmessage:{message}")
         Email = MIMEMultipart()

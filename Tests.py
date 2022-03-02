@@ -1,7 +1,6 @@
 import os
 import sys
 import argparse
-import sqlite3
 from sqlite3 import Error
 
 from Database import Database
@@ -84,14 +83,13 @@ class Tests():
             self.Cleanup(Error=Errors.TestFailedError("Add item test FAILED"))
 
         # Remove Page Test
-        testdb.removePage("https://testurl1.com/")
         testdb.removePage("https://testurl2.com/")
         testdb.removePage("https://testurl3.com/")
         testdb.removePage("https://testurl4.com/")
 
         removePageTest = c.execute("SELECT url, active from pages;").fetchall()
         correctRemovePageTest = [('https://www.willhord.org/', 1),
-                                ('https://testurl1.com/', 0),
+                                ('https://testurl1.com/', 1),
                                 ('https://testurl2.com/', 0),
                                 ('https://testurl3.com/', 0),
                                 ('https://testurl4.com/', 0)]

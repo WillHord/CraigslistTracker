@@ -129,8 +129,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
     Tracker = Controller(args)
     Tracker.start()
-
-
-    # Testing
-    # Tracker.addPage("https://sfbay.craigslist.org/search/scz/zip","Free")
-    # Tracker.commands()
