@@ -12,7 +12,7 @@ class Database():
         conn = None
         try:
             if os.path.exists(database):
-                conn = sqlite3.connect(database)
+                conn = sqlite3.connect(database, check_same_thread=False)
             else:
                 conn = self.setUpDatabase(database)
             print("Connected to database:",database)
@@ -30,7 +30,7 @@ class Database():
             added integer NOT NULL,
             lastChecked integer NOT NULL);"""
         try:
-            conn = sqlite3.connect(database)
+            conn = sqlite3.connect(database, check_same_thread=False)
             c = conn.cursor()
             c.execute(createBaseTable)
             conn.commit()

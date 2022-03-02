@@ -1,15 +1,15 @@
 import sys
 import argparse
 import sched
+import time
 import threading
 
+from datetime import datetime, timedelta
 import os
 
 from Database import Database
 from CraigslistTracker import CraigslistTracker
 import Errors
-
-# TODO: Finish Controller
 
 class Controller():
     scheduler = sched.scheduler(time.time, time.sleep)
@@ -21,10 +21,16 @@ class Controller():
             self.database = database
         self.getEmailPasswd()
         self.Tracker = CraigslistTracker(self.email, self.passwd, self.database)
+        # self.checkInterval = 3600
+        self.checkInterval = 5
+        self.emailHour = 12
+
         if options['remove']:
             self.Tracker.removePage(options['remove'])
         if options['add']:
             self.Tracker.addPage(options['add'])
+        if options['cleanup']:
+            self.cleanup()
 
     def getEmailPasswd(self) -> None:
         if os.path.exists("/etc/emailCredentials"):
@@ -43,10 +49,12 @@ class Controller():
     def commands(self) -> None:
         while(True):
             command = input("> ").split()
-            if command[0][0] == "#":
+            if len(command) == 0:
+                continue
+            elif command[0][0] == "#":
                 continue
             elif command[0].lower() in ["exit","q"]:
-                return
+                self.stop()
             elif command[0].lower() in ["add","a"]:
                 if len(command) < 3:
                     print("ERROR: add command requires 2 additional arguments")
@@ -68,17 +76,47 @@ class Controller():
                 print("usage: [h] [a ADD] [rm REMOVE] [c CHECK] [q EXIT]")
             else:
                 print(f"ERROR: command {' '.join(command)} not recognized")
-    
+
     def cleanup(self):
         if os.path.exists(self.database):
             print(f"Deleting {self.database}...")
             os.remove(self.database)
 
+    def checkPages(self):
+        # print("Checking pages")
+        self.Tracker.checkActivePages()
+        self.scheduler.enter(self.checkInterval,1,self.checkPages)
+        
+    def sendEmail(self) -> None:
+        # TODO: Fix send Email to send email with actual information
+        # self.Tracker.sendEmail("contactwillhord@gmail.com","Test Subject","This is a test message")
+        self.emailHandler()
+        
+    def emailHandler(self) -> None:
+        x=datetime.today()
+        y = x.replace(day=x.day, hour=self.emailHour, minute=0, second=0, microsecond=0) + timedelta(days=1)
+        delta_t=y-x
+        secs=delta_t.total_seconds()
+        t = threading.Timer(secs, self.sendEmail)
+        t.start()
+
     def start(self):
-        pass
+        self.scheduler.enter(self.checkInterval,1,self.checkPages)
+        self.pageThread = threading.Thread(target=self.scheduler.run)
+        self.emailHandler()
+        self.commandThread = threading.Thread(target=self.commands)
+        
+        self.pageThread.daemon = True
+        self.commandThread.daemon = True
+        
+        self.checkPages()
+        self.pageThread.start()
+        # emailThread.start()
+        self.commandThread.start()
     
     def stop(self):
-        pass
+        print("Stopping all processes")
+        os._exit(0)
 
 
 if __name__ == "__main__":
@@ -86,11 +124,13 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--database", help="Define database file location")
     parser.add_argument("-a", "--add", help="Add page to track")
     parser.add_argument("-rm","--remove", help="Remove page from being tracked")
+    parser.add_argument("-c","--cleanup", help="Clean up created files", action='store_true')
 
     args = parser.parse_args()
     Tracker = Controller(args)
+    Tracker.start()
 
 
     # Testing
     # Tracker.addPage("https://sfbay.craigslist.org/search/scz/zip","Free")
-    Tracker.commands()
+    # Tracker.commands()
