@@ -142,15 +142,15 @@ class Tests():
             print("Running All Tests...")
             self.DatabaseTest()
             self.EmailTest(self.email, self.passwd)
-        elif options["email"]:
+        if options["email"]:
             print("Running Email Tests...")
             self.EmailTest(self.email, self.passwd)
-        elif options["database"]:
+        if options["database"]:
             print("Running Database Tests...")
             self.DatabaseTest()
-        elif options["cleanup"]:
+        if options["cleanup"]:
             self.Cleanup()
-        elif options["scrape"]:
+        if options["scrape"]:
             self.webTests()
         print("Done Running all Tests")
 

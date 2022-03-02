@@ -15,6 +15,7 @@ class Database():
                 conn = sqlite3.connect(database)
             else:
                 conn = self.setUpDatabase(database)
+            print("Connected to database:",database)
             print("sqlite3 version:", sqlite3.version)
         except Error as e:
             print(e)
@@ -81,7 +82,7 @@ class Database():
         name = c.execute(f"""SELECT name from pages WHERE url='{pageUrl}';""").fetchone()[0]
         exists = c.execute(f"""SELECT title, active FROM {name.replace(" ", "_")} where url='{url}';""").fetchone()
         if exists:
-            print(f"URL {url} exists in table")
+            # print(f"URL {url} exists in table")
             if exists[1] == 0:
                 c.execute(f"""UPDATE {name.replace(" ","_")} SET lastChecked={int(time.time())}, active=1 WHERE url='{url}';""")
             else:
@@ -104,7 +105,7 @@ class Database():
         name = c.execute(f"""SELECT name from pages WHERE url='{pageUrl}';""").fetchone()[0]
         exists = c.execute(f"""SELECT id FROM {name.replace(" ","_")} where url='{url}';""").fetchone()
         if exists:
-            print(f"URL {url} exists in table")
+            # print(f"URL {url} exists in table")
             c.execute(f"""UPDATE {name.replace(" ","_")} SET active=0, lastChecked={int(time.time())} WHERE url='{url}';""")
             self.conn.commit()
         else:

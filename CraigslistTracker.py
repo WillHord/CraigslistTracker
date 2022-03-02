@@ -22,8 +22,11 @@ class CraigslistTracker():
     def removePage(self, url:str) -> None:
         self.db.removePage(url)
 
-    def getActivePages(self) -> list:
-        return self.db.getActivePages()
+    def checkActivePages(self) -> None:
+        print("Checking active pages")
+        active = self.db.getActivePages()
+        for i in active:
+            self.checkPage(i[0])
 
     def checkPage(self, url: str) -> list:
         output = []
