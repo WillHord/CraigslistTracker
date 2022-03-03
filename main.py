@@ -1,4 +1,3 @@
-import sys
 import argparse
 import sched
 import time
@@ -7,10 +6,10 @@ import threading
 from datetime import datetime, timedelta
 import os
 
-from Database import Database
 from CraigslistTracker import CraigslistTracker
-import Errors
 
+# TODO: fix add name with multiple words
+# TODO: fix issue where email is sent for each page but includes all pages
 class Controller():
     scheduler = sched.scheduler(time.time, time.sleep)
     def __init__(self, flags:argparse.Namespace, database:str = "craigslist.db"):
@@ -21,8 +20,7 @@ class Controller():
             self.database = database
         self.getEmailPasswd()
         self.Tracker = CraigslistTracker(self.email, self.passwd, self.database)
-        # self.checkInterval = 3600
-        self.checkInterval = 5
+        self.checkInterval = 3600
         self.emailHour = 12
 
         if options['remove']:
@@ -76,7 +74,7 @@ class Controller():
                 print("Sending email updates")
                 self.Tracker.handleEmails()
             elif command[0].lower() in ["help","h"]:
-                print("usage: [h] [a ADD] [rm REMOVE] [c CHECK] [q EXIT]")
+                print("usage: [h] [a ADD] [rm REMOVE] [c CHECK] [q EXIT] [e EMAIL]")
             else:
                 print(f"ERROR: command {' '.join(command)} not recognized")
 

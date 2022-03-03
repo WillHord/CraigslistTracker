@@ -7,7 +7,6 @@ from Database import Database
 from CraigslistTracker import CraigslistTracker
 import Errors
 
-
 class Tests():
     email = "contactwillhord@gmail.com"
     with open("/etc/contactwillhordpasswd") as f:
