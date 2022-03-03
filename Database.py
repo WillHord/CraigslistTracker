@@ -126,7 +126,6 @@ class Database():
         return c.execute("SELECT url from pages WHERE active=1;").fetchall()
 
     def getAllActiveItems(self) -> dict:
-        print("getAllActiveItems")
         pageitemdict = {}
         c = self.conn.cursor()
         pages = c.execute("SELECT name, url from pages WHERE active=1;").fetchall()

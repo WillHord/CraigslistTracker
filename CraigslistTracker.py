@@ -76,9 +76,9 @@ class CraigslistTracker():
                     }
                 </style>"""
         pages = self.db.getAllActiveItems()
-        tables =[]
         nl = '\n'
         for i,j in pages.items():
+            tables =[]
             items = []
             for k in j:
                 items.append(f"""

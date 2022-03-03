@@ -8,7 +8,6 @@ import os
 
 from CraigslistTracker import CraigslistTracker
 
-# TODO: fix issue where email is sent for each page but includes all pages
 # TODO: make sure empty lists don't mess up sending emails
 class Controller():
     scheduler = sched.scheduler(time.time, time.sleep)
