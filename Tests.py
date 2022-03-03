@@ -98,6 +98,8 @@ class Tests():
         else:
             self.Cleanup(Error=Errors.TestFailedError("Remove page test FAILED"))
 
+        pagedict = testdb.getAllActiveItems()
+
         testdb.close()
         print("ALL DATABASE TESTS PASSED")
         self.Cleanup()

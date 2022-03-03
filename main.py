@@ -72,6 +72,9 @@ class Controller():
             elif command[0].lower() in ["check","c"]:
                 print("Checking pages")
                 self.Tracker.checkActivePages()
+            elif command[0].lower() in ["-e","--email"]:
+                print("Sending email updates")
+                self.Tracker.handleEmails()
             elif command[0].lower() in ["help","h"]:
                 print("usage: [h] [a ADD] [rm REMOVE] [c CHECK] [q EXIT]")
             else:
@@ -86,12 +89,11 @@ class Controller():
         # print("Checking pages")
         self.Tracker.checkActivePages()
         self.scheduler.enter(self.checkInterval,1,self.checkPages)
-        
+
     def sendEmail(self) -> None:
-        # TODO: Fix send Email to send email with actual information
-        # self.Tracker.sendEmail("contactwillhord@gmail.com","Test Subject","This is a test message")
+        self.Tracker.handleEmails()
         self.emailHandler()
-        
+
     def emailHandler(self) -> None:
         x=datetime.today()
         y = x.replace(day=x.day, hour=self.emailHour, minute=0, second=0, microsecond=0) + timedelta(days=1)
@@ -105,15 +107,14 @@ class Controller():
         self.pageThread = threading.Thread(target=self.scheduler.run)
         self.emailHandler()
         self.commandThread = threading.Thread(target=self.commands)
-        
+
         self.pageThread.daemon = True
         self.commandThread.daemon = True
-        
+
         self.checkPages()
         self.pageThread.start()
-        # emailThread.start()
         self.commandThread.start()
-    
+
     def stop(self):
         print("Stopping all processes")
         os._exit(0)

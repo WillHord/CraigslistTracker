@@ -3,6 +3,7 @@ import requests
 import email, smtplib, ssl
 from lxml import html
 import re
+from datetime import date
 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -23,7 +24,6 @@ class CraigslistTracker():
         self.db.removePage(url)
 
     def checkActivePages(self) -> None:
-        print("Checking active pages")
         active = self.db.getActivePages()
         for i in active:
             self.checkPage(i[0])
@@ -47,12 +47,10 @@ class CraigslistTracker():
             output.append([title.text, title.attrib["href"], date.attrib["datetime"], price, location.strip(" ()")])
         nextPage = page.xpath(".//div[@class='search-legend']/div/span/a[@class='button next']")[0]
         if nextPage.attrib["href"] != "":
-            print("Checking next page")
             output = output + self.checkPage(re.search(r".+?(?:org)", url).group() + nextPage.attrib["href"])
         return output
 
     def handleEmails(self):
-        
         css = """<style>
                     #Page {
                     font-family: Arial, Helvetica, sans-serif;
@@ -77,45 +75,53 @@ class CraigslistTracker():
                     color: white;
                     }
                 </style>"""
-        html = f"""
-            <html>
-                <head>
-                {css}
-                </head>
-                <body>
-                <h2><a href="willhord.org">Page Name</a></h2>
-                    <table id="Page">
-                    <tr>
-                        <th>Item</th>
-                        <th>Price</th>
-                        <th>Location</th>
-                        <th>Date Posted</th>
-                    </tr>
-                    <tr>
-                        <td><a href="willhord.org">Item 1</a></td>
-                        <td>$23</td>
-                        <td>Santa Cruz</td>
-                        <td>March 4</td>
-                    </tr>
-                    <tr>
-                        <td><a href="willhord.org">Item 2</a></td>
-                        <td>$3</td>
-                        <td>Santa Cruz</td>
-                        <td>March 2</td>
-                    </tr>
-                </table>
-                </body>
+        pages = self.db.getAllActiveItems()
+        tables =[]
+        nl = '\n'
+        for i,j in pages.items():
+            items = []
+            for k in j:
+                items.append(f"""
+                <tr>
+                    <td><a href="{k[1]}">{k[0]}</a></td>
+                    <td>${k[2]}</td>
+                    <td>{k[3]}</td>
+                    <td>{k[4]}</td>
+                </tr>""")
+            tables.append(f"""
+            <h2><a href="{i[1]}">{i[0]}</a></h2>
+            <table id="Page">
+            <tr>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Location</th>
+                <th>Date Posted</th>
+            </tr>
+            {nl.join(items)}
+            <br>
+            """)
+        
+            html = f"""
+                <html>
+                    <head>
+                    {css}
+                    </head>
+                    <body>
+                    {nl.join(tables)}
+                    </body>
                 </html>"""
-        pass
+            self.sendEmail("contactwillhord@gmail.com",
+                           f"Craigslist Update for {i[0]} {date.today().strftime('%d/%m/%Y')}",
+                           html
+                           )
 
-    def sendEmail(self, recipient: str, subject: str, message: str):
-        print(f"Sending email to {recipient}\nsubject:{subject}\nmessage:{message}")
+    def sendEmail(self, recipient: str, subject: str, html: str):
         Email = MIMEMultipart()
         Email["From"] = self.email
         Email["To"] = recipient
         Email["Subject"] = subject
 
-        Email.attach(MIMEText(message, "plain"))
+        Email.attach(MIMEText(html, "html"))
 
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:

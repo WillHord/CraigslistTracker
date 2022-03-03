@@ -129,9 +129,9 @@ class Database():
         print("getAllActiveItems")
         pageitemdict = {}
         c = self.conn.cursor()
-        pages = c.execute("SELECT name from pages WHERE active=1;").fetchall()
+        pages = c.execute("SELECT name, url from pages WHERE active=1;").fetchall()
         for i in pages:
-            pageitemdict[i[0]] = c.execute(f"SELECT title, price, location, posted FROM {i[0].replace(' ','_')} WHERE active=1;").fetchall()
+            pageitemdict[(i[0],i[1])] = c.execute(f"SELECT title, url, price, location, posted FROM {i[0].replace(' ','_')} WHERE active=1;").fetchall()
         return pageitemdict
 
     def close(self) -> None:
