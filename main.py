@@ -8,8 +8,8 @@ import os
 
 from CraigslistTracker import CraigslistTracker
 
-# TODO: fix add name with multiple words
 # TODO: fix issue where email is sent for each page but includes all pages
+# TODO: make sure empty lists don't mess up sending emails
 class Controller():
     scheduler = sched.scheduler(time.time, time.sleep)
     def __init__(self, flags:argparse.Namespace, database:str = "craigslist.db"):
@@ -59,7 +59,7 @@ class Controller():
                     print("Format: add {url} {name}")
                     continue
                 print("Adding page:", command[1])
-                self.Tracker.addPage(command[1],command[2])
+                self.Tracker.addPage(command[1]," ".join(command[2:]))
             elif command[0].lower() in ["remove","rm"]:
                 if len(command) < 2:
                     print("ERROR: add command requires 1 additional arguments")

@@ -100,7 +100,6 @@ class CraigslistTracker():
             {nl.join(items)}
             <br>
             """)
-        
             html = f"""
                 <html>
                     <head>
