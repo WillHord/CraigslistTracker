@@ -70,7 +70,7 @@ class Controller():
             elif command[0].lower() in ["check","c"]:
                 print("Checking pages")
                 self.Tracker.checkActivePages()
-            elif command[0].lower() in ["-e","--email"]:
+            elif command[0].lower() in ["e","email"]:
                 print("Sending email updates")
                 self.Tracker.handleEmails()
             elif command[0].lower() in ["help","h"]:
